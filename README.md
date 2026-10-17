@@ -14,9 +14,10 @@ Requirements: Python 3.10+, and either PostgreSQL (recommended) or nothing
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 
-# Option A: PostgreSQL via docker compose
+# Option A: PostgreSQL via docker compose (credentials come from .env / your shell)
+cp .env.example .env   # then set POSTGRES_PASSWORD and DATABASE_URL to match
+set -a; source .env; set +a
 docker compose up -d db
-export DATABASE_URL=postgresql://postgres:postgres@localhost:5432/opsib
 
 # Option B: zero-setup SQLite (limitations noted below)
 export DATABASE_URL=sqlite:///./opsib.db
@@ -39,7 +40,7 @@ curl "localhost:8000/tasks?assignee_id=HR-102"
 
 | Variable | Default | Purpose |
 |---|---|---|
-| `DATABASE_URL` | `sqlite:///./opsib.db` | SQLAlchemy URL. PostgreSQL for a real pilot. |
+| `DATABASE_URL` | `sqlite:///./opsib.db` | SQLAlchemy URL. PostgreSQL for a real pilot; set credentials via env, never in source. |
 | `EVAL_TIME` | `2026-10-16T15:00:00+05:30` | **Frozen scenario clock.** All deadline and shift logic uses this, never the machine clock. |
 | `FIXTURES_DIR` | `fixtures` | Where `POST /imports/fixture-pack` reads the CSVs. |
 | `AVAILABILITY_FRESHNESS_MINUTES` | `60` | Max age of a workforce sample for routing eligibility at `EVAL_TIME`. |
@@ -50,7 +51,7 @@ curl "localhost:8000/tasks?assignee_id=HR-102"
 
 ```bash
 pytest                 # zero-setup: in-memory SQLite
-TEST_DATABASE_URL=postgresql://postgres:postgres@localhost:5432/opsib_test pytest
+TEST_DATABASE_URL=postgresql://opsib:$POSTGRES_PASSWORD@localhost:5432/opsib_test pytest
 ```
 
 Verified locally: **33 passed** on both in-memory SQLite and PostgreSQL 14.
