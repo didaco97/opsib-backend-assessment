@@ -2,9 +2,10 @@ services:
   db:
     image: postgres:16
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: opsib
+      # Credentials come from your shell / .env (see .env.example) - never hard-code them.
+      POSTGRES_USER: ${POSTGRES_USER:-opsib}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD before running docker compose}
+      POSTGRES_DB: ${POSTGRES_DB:-opsib}
     ports:
       - "5432:5432"
     healthcheck:
